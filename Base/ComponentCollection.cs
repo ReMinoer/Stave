@@ -10,14 +10,14 @@ namespace Stave.Base
         where TParent : class, TAbstract, IParent<TAbstract, TParent>
         where TComponent : class, TAbstract
     {
-        private readonly IParent<TAbstract, TParent> _parent;
+        private readonly IParent<TAbstract, TParent> _owner;
         private readonly List<TComponent> _components;
         public int Count => _components.Count;
         public bool IsReadOnly => false;
 
-        public ComponentCollection(IParent<TAbstract, TParent> parent)
+        public ComponentCollection(IParent<TAbstract, TParent> owner)
         {
-            _parent = parent;
+            _owner = owner;
             _components = new List<TComponent>();
         }
 
@@ -31,22 +31,22 @@ namespace Stave.Base
         {
             if (Equals(item))
                 throw new InvalidOperationException("Item can't be a child of itself.");
-            if (_parent.ContainsAmongParents(item))
+            if (_owner.ContainsAmongParents(item))
                 throw new InvalidOperationException("Item can't be a child of this because it already exist among its parents.");
 
             if (!Contains(item))
                 _components.Add(item);
 
-            item.Parent = _parent as TParent;
+            item.Parent = _owner as TParent;
         }
 
-        public void Remove(TComponent item)
+        public bool Remove(TComponent item)
         {
-            if (!_components.Contains(item))
-                throw new InvalidChildException("Component provided is not linked !");
+            if (!_components.Remove(item))
+                return false;
 
-            _components.Remove(item);
             item.Parent = null;
+            return true;
         }
 
         public void Replace(ref TComponent reference, TComponent newItem)
@@ -102,19 +102,6 @@ namespace Stave.Base
         void ICollection<TComponent>.CopyTo(TComponent[] array, int arrayIndex)
         {
             _components.CopyTo(array, arrayIndex);
-        }
-
-        bool ICollection<TComponent>.Remove(TComponent item)
-        {
-            try
-            {
-                Remove(item);
-                return true;
-            }
-            catch (Exception)
-            {
-                return false;
-            }
         }
     }
 }

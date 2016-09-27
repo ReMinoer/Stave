@@ -23,7 +23,7 @@ namespace Stave
 
                 if (value != null)
                 {
-                    if (Equals(value))
+                    if (this == value)
                         throw new InvalidOperationException("Item can't be a child of itself.");
                     if (ContainsAmongParents(value))
                         throw new InvalidOperationException("Item can't be a child of this because it already exist among its parents.");
@@ -177,7 +177,7 @@ namespace Stave
                 throw new InvalidChildException("Component provided must be of type " + typeof(TComponent) + " !");
 
             if (Component == child)
-                return false;
+                return true;
 
             Component = component;
             return true;

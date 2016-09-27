@@ -159,7 +159,7 @@ namespace Stave.Base
                 throw new InvalidChildException("Component provided must be of type " + typeof(TComponent));
 
             if (Contains(component))
-                return false;
+                return true;
 
             Link(component);
             return true;

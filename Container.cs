@@ -23,11 +23,17 @@ namespace Stave
 
         protected override sealed void Link(TComponent component)
         {
+            if (component.Parent == this)
+                return;
+
             throw new ReadOnlyParentException();
         }
 
         protected override sealed void Unlink(TComponent component)
         {
+            if (component.Parent == this)
+                return;
+
             throw new ReadOnlyParentException();
         }
     }

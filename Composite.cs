@@ -22,9 +22,9 @@ namespace Stave
             Components.Add(item);
         }
 
-        public virtual void Remove(TComponent item)
+        public virtual bool Remove(TComponent item)
         {
-            Components.Remove(item);
+            return Components.Remove(item);
         }
 
         public virtual void Clear()
@@ -55,11 +55,6 @@ namespace Stave
         void ICollection<TComponent>.CopyTo(TComponent[] array, int arrayIndex)
         {
             ((ICollection<TComponent>)Components).CopyTo(array, arrayIndex);
-        }
-
-        bool ICollection<TComponent>.Remove(TComponent item)
-        {
-            return ((ICollection<TComponent>)Components).Remove(item);
         }
     }
 }
