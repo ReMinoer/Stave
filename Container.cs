@@ -26,7 +26,7 @@ namespace Stave
             if (component.Parent == this)
                 return;
 
-            throw new ReadOnlyParentException();
+            throw new ReadOnlyParentException(ReadOnlyParent.New);
         }
 
         protected override sealed void Unlink(TComponent component)
@@ -34,7 +34,7 @@ namespace Stave
             if (component.Parent == this)
                 return;
 
-            throw new ReadOnlyParentException();
+            throw new ReadOnlyParentException(ReadOnlyParent.Previous);
         }
     }
 }

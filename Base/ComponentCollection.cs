@@ -1,7 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using Stave.Exceptions;
+using System.Linq;
 
 namespace Stave.Base
 {
@@ -29,9 +29,11 @@ namespace Stave.Base
 
         public void Add(TComponent item)
         {
-            if (Equals(item))
+            if (_owner == item)
                 throw new InvalidOperationException("Item can't be a child of itself.");
-            if (_owner.ContainsAmongParents(item))
+
+            var itemParent = item as TParent;
+            if (itemParent != null && _owner.ParentQueue().Contains(itemParent))
                 throw new InvalidOperationException("Item can't be a child of this because it already exist among its parents.");
 
             if (!Contains(item))

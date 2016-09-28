@@ -39,6 +39,7 @@
     <Compile Include="Base\ComponentCollection.cs" />
     <Compile Include="Base\ComponentEnumerable.cs" />
     <Compile Include="Component.cs" />
+    <Compile Include="ComponentExtensions.cs" />
     <Compile Include="Composite.cs" />
     <Compile Include="Container.cs" />
     <Compile Include="Decorator.cs" />

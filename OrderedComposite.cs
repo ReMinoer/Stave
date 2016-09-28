@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 
 namespace Stave
 {
@@ -14,9 +15,11 @@ namespace Stave
             {
                 if (value != null)
                 {
-                    if (Equals(value))
+                    if (this == value)
                         throw new InvalidOperationException("Item can't be a child of itself.");
-                    if (ContainsAmongParents(value))
+
+                    var valueAsParent = value as TParent;
+                    if (valueAsParent != null && this.ParentQueue().Contains(valueAsParent))
                         throw new InvalidOperationException("Item can't be a child of this because it already exist among its parents.");
 
                     if (!Contains(value))
@@ -34,9 +37,11 @@ namespace Stave
 
         public virtual void Insert(int index, TComponent item)
         {
-            if (Equals(item))
+            if (this == item)
                 throw new InvalidOperationException("Item can't be a child of itself.");
-            if (ContainsAmongParents(item))
+
+            var itemAsParent = item as TParent;
+            if (itemAsParent != null && this.ParentQueue().Contains(itemAsParent))
                 throw new InvalidOperationException("Item can't be a child of this because it is already among its parents.");
 
             if (!Contains(item))
