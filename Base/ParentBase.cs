@@ -5,15 +5,35 @@ using Stave.Exceptions;
 
 namespace Stave.Base
 {
-    public abstract class ComponentEnumerable<TAbstract, TParent, TComponent> : ComponentBase<TAbstract, TParent>, IParent<TAbstract, TParent>, IEnumerable<TComponent>
+    public abstract class ParentBase<TAbstract, TParent, TComponent> : ComponentBase<TAbstract, TParent>, IParent<TAbstract, TParent, TComponent>, IEnumerable<TComponent>
         where TAbstract : class, IComponent<TAbstract, TParent>
         where TParent : class, TAbstract, IParent<TAbstract, TParent>
         where TComponent : class, TAbstract
     {
-        protected override sealed IEnumerable<TAbstract> ProtectedComponents => this;
-        public abstract IEnumerator<TComponent> GetEnumerator();
+        protected internal override sealed IEnumerable<TAbstract> ProtectedComponents => ProtectedComponents2;
+        IEnumerable<TComponent> IParent<TAbstract, TParent, TComponent>.Components => ProtectedComponents2;
+        protected internal abstract IEnumerable<TComponent> ProtectedComponents2 { get; }
+
         protected abstract void Link(TComponent component);
         protected abstract void Unlink(TComponent component);
+
+        bool IParent<TAbstract, TParent, TComponent>.Link(TComponent component)
+        {
+            if (this.Contains(component))
+                return true;
+
+            Link(component);
+            return true;
+        }
+
+        bool IParent<TAbstract, TParent, TComponent>.Unlink(TComponent component)
+        {
+            if (!this.Contains(component))
+                return false;
+
+            Unlink(component);
+            return true;
+        }
 
         bool IParent<TAbstract, TParent>.Link(TAbstract child)
         {
@@ -39,6 +59,11 @@ namespace Stave.Base
 
             Unlink(component);
             return true;
+        }
+
+        public IEnumerator<TComponent> GetEnumerator()
+        {
+            return ProtectedComponents2.GetEnumerator();
         }
 
         IEnumerator IEnumerable.GetEnumerator()

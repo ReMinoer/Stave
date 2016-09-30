@@ -4,21 +4,17 @@ using Stave.Exceptions;
 
 namespace Stave
 {
-    public class Container<TAbstract, TParent, TComponent> : ComponentEnumerable<TAbstract, TParent, TComponent>, IContainer<TAbstract, TParent, TComponent>
+    public class Container<TAbstract, TParent, TComponent> : ParentBase<TAbstract, TParent, TComponent>, IContainer<TAbstract, TParent, TComponent>
         where TAbstract : class, IComponent<TAbstract, TParent>
         where TParent : class, TAbstract, IParent<TAbstract, TParent>
         where TComponent : class, TAbstract
     {
-        protected readonly ComponentCollection<TAbstract, TParent, TComponent> Components;
+        protected readonly ComponentList<TAbstract, TParent, TComponent> Components;
+        protected internal override IEnumerable<TComponent> ProtectedComponents2 => Components;
 
         protected Container()
         {
-            Components = new ComponentCollection<TAbstract, TParent, TComponent>(this);
-        }
-
-        public override IEnumerator<TComponent> GetEnumerator()
-        {
-            return Components.GetEnumerator();
+            Components = new ComponentList<TAbstract, TParent, TComponent>(this);
         }
 
         protected override sealed void Link(TComponent component)

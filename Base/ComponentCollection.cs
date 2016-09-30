@@ -5,46 +5,40 @@ using System.Linq;
 
 namespace Stave.Base
 {
-    public class ComponentCollection<TAbstract, TParent, TComponent> : IList<TComponent>
+    public class ComponentCollection<TAbstract, TParent, TComponent> : ICollection<TComponent>
         where TAbstract : class, IComponent<TAbstract, TParent>
         where TParent : class, TAbstract, IParent<TAbstract, TParent>
         where TComponent : class, TAbstract
     {
-        private readonly IParent<TAbstract, TParent> _owner;
-        private readonly List<TComponent> _components;
-        public int Count => _components.Count;
+        protected readonly IParent<TAbstract, TParent> Owner;
+        protected readonly List<TComponent> Components;
+        public int Count => Components.Count;
         public bool IsReadOnly => false;
 
         public ComponentCollection(IParent<TAbstract, TParent> owner)
         {
-            _owner = owner;
-            _components = new List<TComponent>();
-        }
-
-        public TComponent this[int index]
-        {
-            get { return _components[index]; }
-            set { _components[index] = value; }
+            Owner = owner;
+            Components = new List<TComponent>();
         }
 
         public void Add(TComponent item)
         {
-            if (_owner == item)
+            if (Owner == item)
                 throw new InvalidOperationException("Item can't be a child of itself.");
 
             var itemParent = item as TParent;
-            if (itemParent != null && _owner.ParentQueue().Contains(itemParent))
+            if (itemParent != null && Owner.ParentQueue().Contains(itemParent))
                 throw new InvalidOperationException("Item can't be a child of this because it already exist among its parents.");
 
             if (!Contains(item))
-                _components.Add(item);
+                Components.Add(item);
 
-            item.Parent = _owner as TParent;
+            item.Parent = Owner as TParent;
         }
 
         public bool Remove(TComponent item)
         {
-            if (!_components.Remove(item))
+            if (!Components.Remove(item))
                 return false;
 
             item.Parent = null;
@@ -68,42 +62,27 @@ namespace Stave.Base
         public void Clear()
         {
             for (int i = Count; i > 0; i--)
-                Remove(_components[0]);
+                Remove(Components[0]);
         }
 
         public bool Contains(TComponent item)
         {
-            return _components.Contains(item);
-        }
-
-        public int IndexOf(TComponent item)
-        {
-            return _components.IndexOf(item);
-        }
-
-        public void Insert(int index, TComponent item)
-        {
-            _components.Insert(index, item);
-        }
-
-        public void RemoveAt(int index)
-        {
-            _components.RemoveAt(index);
+            return Components.Contains(item);
         }
 
         public IEnumerator<TComponent> GetEnumerator()
         {
-            return _components.GetEnumerator();
+            return Components.GetEnumerator();
         }
 
         IEnumerator IEnumerable.GetEnumerator()
         {
-            return ((IEnumerable)_components).GetEnumerator();
+            return ((IEnumerable)Components).GetEnumerator();
         }
 
         void ICollection<TComponent>.CopyTo(TComponent[] array, int arrayIndex)
         {
-            _components.CopyTo(array, arrayIndex);
+            Components.CopyTo(array, arrayIndex);
         }
     }
 }

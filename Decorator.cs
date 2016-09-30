@@ -6,7 +6,7 @@ using Stave.Exceptions;
 
 namespace Stave
 {
-    public class Decorator<TAbstract, TParent, TComponent> : ComponentBase<TAbstract, TParent>, IDecorator<TAbstract, TParent, TComponent>
+    public class Decorator<TAbstract, TParent, TComponent> : ParentBase<TAbstract, TParent, TComponent>, IDecorator<TAbstract, TParent, TComponent>
         where TAbstract : class, IComponent<TAbstract, TParent>
         where TParent : class, TAbstract, IParent<TAbstract, TParent>
         where TComponent : class, TAbstract
@@ -38,42 +38,30 @@ namespace Stave
             }
         }
 
-        protected override IEnumerable<TAbstract> ProtectedComponents
+        protected internal override IEnumerable<TComponent> ProtectedComponents2
         {
-            get { yield return Component; }
+            get
+            {
+                if (Component != null)
+                    yield return Component;
+            }
         }
 
         public TComponent Unlink()
         {
             TComponent component = Component;
-            Component = null;
+            Unlink(Component);
             return component;
         }
 
-        bool IParent<TAbstract, TParent>.Link(TAbstract child)
+        protected override void Link(TComponent component)
         {
-            var component = child as TComponent;
-            if (component == null)
-                throw new InvalidChildException("Component provided must be of type " + typeof(TComponent) + " !");
-
-            if (Component == child)
-                return true;
-
             Component = component;
-            return true;
         }
 
-        bool IParent<TAbstract, TParent>.Unlink(TAbstract child)
+        protected override void Unlink(TComponent component)
         {
-            var component = child as TComponent;
-            if (component == null)
-                throw new InvalidChildException("Component provided must be of type " + typeof(TComponent) + " !");
-
-            if (Component != child)
-                return false;
-
             Component = null;
-            return true;
         }
     }
 }

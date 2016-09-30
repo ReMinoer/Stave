@@ -1,62 +1,82 @@
-﻿using System;
-using System.Linq;
+﻿using System.Collections.Generic;
+using Diese.Collections;
+using Stave.Base;
 
 namespace Stave
 {
-    public class OrderedComposite<TAbstract, TParent, TComponent> : Composite<TAbstract, TParent, TComponent>, IOrderedComposite<TAbstract, TParent, TComponent>
+    public class OrderedComposite<TAbstract, TParent, TComponent> : ParentBase<TAbstract, TParent, TComponent>, IOrderedComposite<TAbstract, TParent, TComponent>
         where TAbstract : class, IComponent<TAbstract, TParent>
         where TParent : class, TAbstract, IParent<TAbstract, TParent>
         where TComponent : class, TAbstract
     {
-        public virtual TComponent this[int index]
+        private readonly ComponentList<TAbstract, TParent, TComponent> _componentList;
+        public IReadOnlyList<TComponent> Components { get; }
+
+        protected internal override IEnumerable<TComponent> ProtectedComponents2 => Components;
+        int ICollection<TComponent>.Count => _componentList.Count;
+        bool ICollection<TComponent>.IsReadOnly => _componentList.IsReadOnly;
+        IEnumerable<TComponent> IParent<TAbstract, TParent, TComponent>.Components => Components;
+
+        TComponent IOrderedComposite<TAbstract, TParent, TComponent>.this[int index]
         {
-            get { return Components[index]; }
-            set
-            {
-                if (value != null)
-                {
-                    if (this == value)
-                        throw new InvalidOperationException("Item can't be a child of itself.");
+            get { return _componentList[index]; }
+            set { _componentList[index] = value; }
+        }
 
-                    var valueAsParent = value as TParent;
-                    if (valueAsParent != null && this.ParentQueue().Contains(valueAsParent))
-                        throw new InvalidOperationException("Item can't be a child of this because it already exist among its parents.");
+        public OrderedComposite()
+        {
+            _componentList = new ComponentList<TAbstract, TParent, TComponent>(this);
+            Components = new ReadOnlyList<TComponent>(_componentList);
+        }
 
-                    if (!Contains(value))
-                        Components.Add(value);
-                }
+        public void Add(TComponent item)
+        {
+            _componentList.Add(item);
+        }
 
-                Components[index] = value;
-            }
+        public void Clear()
+        {
+            _componentList.Clear();
+        }
+
+        public bool Contains(TComponent item)
+        {
+            return _componentList.Contains(item);
+        }
+
+        public bool Remove(TComponent item)
+        {
+            return _componentList.Remove(item);
         }
 
         public int IndexOf(TComponent item)
         {
-            return Components.IndexOf(item);
+            return _componentList.IndexOf(item);
         }
 
-        public virtual void Insert(int index, TComponent item)
+        public void Insert(int index, TComponent item)
         {
-            if (this == item)
-                throw new InvalidOperationException("Item can't be a child of itself.");
-
-            var itemAsParent = item as TParent;
-            if (itemAsParent != null && this.ParentQueue().Contains(itemAsParent))
-                throw new InvalidOperationException("Item can't be a child of this because it is already among its parents.");
-
-            if (!Contains(item))
-                Components.Add(item);
-
-            Components.Insert(index, item);
-
-            if (item != null)
-                item.Parent = this as TParent;
+            _componentList.Insert(index, item);
         }
 
-        public virtual void RemoveAt(int index)
+        public void RemoveAt(int index)
         {
-            Components.RemoveAt(index);
-            Components[index].Parent = null;
+            _componentList.RemoveAt(index);
+        }
+
+        protected override sealed void Link(TComponent component)
+        {
+            Add(component);
+        }
+
+        protected override void Unlink(TComponent component)
+        {
+            Remove(component);
+        }
+
+        void ICollection<TComponent>.CopyTo(TComponent[] array, int arrayIndex)
+        {
+            ((ICollection<TComponent>)_componentList).CopyTo(array, arrayIndex);
         }
     }
 }

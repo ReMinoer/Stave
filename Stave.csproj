@@ -37,7 +37,8 @@
   <ItemGroup>
     <Compile Include="Base\ComponentBase.cs" />
     <Compile Include="Base\ComponentCollection.cs" />
-    <Compile Include="Base\ComponentEnumerable.cs" />
+    <Compile Include="Base\ComponentList.cs" />
+    <Compile Include="Base\ParentBase.cs" />
     <Compile Include="Component.cs" />
     <Compile Include="ComponentExtensions.cs" />
     <Compile Include="Composite.cs" />
@@ -53,6 +54,12 @@
     <Compile Include="IParent.cs" />
     <Compile Include="OrderedComposite.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Diese\Diese.Collections\Diese.Collections.csproj">
+      <Project>{8E354191-E8E5-498B-9C24-A6765DA86417}</Project>
+      <Name>Diese.Collections</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
