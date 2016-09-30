@@ -1,9 +1,13 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
-VisualStudioVersion = 14.0.25123.0
+VisualStudioVersion = 14.0.25420.1
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Stave", "Stave.csproj", "{38A041E6-5AA9-4C22-B96F-35167F171959}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "External", "External", "{F5F90730-2187-4B80-8240-2151604CD173}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Diese.Collections", "External\Diese\Diese.Collections\Diese.Collections.csproj", "{8E354191-E8E5-498B-9C24-A6765DA86417}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,8 +19,15 @@ Global
 		{38A041E6-5AA9-4C22-B96F-35167F171959}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{38A041E6-5AA9-4C22-B96F-35167F171959}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{38A041E6-5AA9-4C22-B96F-35167F171959}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8E354191-E8E5-498B-9C24-A6765DA86417}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8E354191-E8E5-498B-9C24-A6765DA86417}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8E354191-E8E5-498B-9C24-A6765DA86417}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8E354191-E8E5-498B-9C24-A6765DA86417}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{8E354191-E8E5-498B-9C24-A6765DA86417} = {F5F90730-2187-4B80-8240-2151604CD173}
 	EndGlobalSection
 EndGlobal

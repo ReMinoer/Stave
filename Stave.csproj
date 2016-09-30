@@ -56,8 +56,8 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Diese\Diese.Collections\Diese.Collections.csproj">
-      <Project>{8E354191-E8E5-498B-9C24-A6765DA86417}</Project>
+    <ProjectReference Include="External\Diese\Diese.Collections\Diese.Collections.csproj">
+      <Project>{8e354191-e8e5-498b-9c24-a6765da86417}</Project>
       <Name>Diese.Collections</Name>
     </ProjectReference>
   </ItemGroup>
