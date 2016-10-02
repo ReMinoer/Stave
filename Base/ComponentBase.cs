@@ -7,8 +7,8 @@ namespace Stave.Base
         where TParent : class, TAbstract, IParent<TAbstract, TParent>
     {
         private TParent _parent;
-        IEnumerable<TAbstract> IComponent<TAbstract, TParent>.Components => ProtectedComponents;
-        protected internal abstract IEnumerable<TAbstract> ProtectedComponents { get; }
+        IEnumerable<TAbstract> IComponent<TAbstract, TParent>.Components => InternalAbstracts;
+        internal abstract IEnumerable<TAbstract> InternalAbstracts { get; }
 
         public TParent Parent
         {

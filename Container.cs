@@ -10,14 +10,14 @@ namespace Stave
         where TComponent : class, TAbstract
     {
         protected readonly ComponentList<TAbstract, TParent, TComponent> Components;
-        protected internal override IEnumerable<TComponent> ProtectedComponents2 => Components;
+        internal override IEnumerable<TComponent> InternalComponents => Components;
 
         protected Container()
         {
             Components = new ComponentList<TAbstract, TParent, TComponent>(this);
         }
 
-        protected override sealed void Link(TComponent component)
+        internal override sealed void Link(TComponent component)
         {
             if (component.Parent == this)
                 return;
@@ -25,7 +25,7 @@ namespace Stave
             throw new ReadOnlyParentException(ReadOnlyParent.New);
         }
 
-        protected override sealed void Unlink(TComponent component)
+        internal override sealed void Unlink(TComponent component)
         {
             if (component.Parent == this)
                 return;

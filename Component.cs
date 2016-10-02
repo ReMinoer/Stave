@@ -7,7 +7,7 @@ namespace Stave
         where TAbstract : class, IComponent<TAbstract, TParent>
         where TParent : class, TAbstract, IParent<TAbstract, TParent>
     {
-        protected internal override sealed IEnumerable<TAbstract> ProtectedComponents
+        internal override sealed IEnumerable<TAbstract> InternalAbstracts
         {
             get { yield break; }
         }

@@ -38,7 +38,7 @@ namespace Stave
             }
         }
 
-        protected internal override IEnumerable<TComponent> ProtectedComponents2
+        internal override IEnumerable<TComponent> InternalComponents
         {
             get
             {
@@ -54,12 +54,12 @@ namespace Stave
             return component;
         }
 
-        protected override void Link(TComponent component)
+        internal override void Link(TComponent component)
         {
             Component = component;
         }
 
-        protected override void Unlink(TComponent component)
+        internal override void Unlink(TComponent component)
         {
             Component = null;
         }

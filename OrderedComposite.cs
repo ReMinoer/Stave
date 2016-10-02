@@ -11,11 +11,9 @@ namespace Stave
     {
         private readonly ComponentList<TAbstract, TParent, TComponent> _componentList;
         public IReadOnlyList<TComponent> Components { get; }
-
-        protected internal override IEnumerable<TComponent> ProtectedComponents2 => Components;
-        int ICollection<TComponent>.Count => _componentList.Count;
-        bool ICollection<TComponent>.IsReadOnly => _componentList.IsReadOnly;
+        internal override IEnumerable<TComponent> InternalComponents => Components;
         IEnumerable<TComponent> IParent<TAbstract, TParent, TComponent>.Components => Components;
+        IReadOnlyCollection<TComponent> IComposite<TAbstract, TParent, TComponent>.Components => Components;
 
         TComponent IOrderedComposite<TAbstract, TParent, TComponent>.this[int index]
         {
@@ -64,19 +62,14 @@ namespace Stave
             _componentList.RemoveAt(index);
         }
 
-        protected override sealed void Link(TComponent component)
+        internal override sealed void Link(TComponent component)
         {
             Add(component);
         }
 
-        protected override void Unlink(TComponent component)
+        internal override void Unlink(TComponent component)
         {
             Remove(component);
-        }
-
-        void ICollection<TComponent>.CopyTo(TComponent[] array, int arrayIndex)
-        {
-            ((ICollection<TComponent>)_componentList).CopyTo(array, arrayIndex);
         }
     }
 }
