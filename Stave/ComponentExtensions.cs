@@ -9,14 +9,14 @@ namespace Stave
             where TAbstract : class, IComponent<TAbstract, TParent>
             where TParent : class, TAbstract, IParent<TAbstract, TParent>
         {
-            TAbstract[] components = component.Components.ToArray();
-            if (components.Length == 0)
-                yield break;
-
-            foreach (TAbstract child in components)
+            IEnumerable<TAbstract> children = Enumerable.Empty<TAbstract>();
+            foreach (TAbstract child in component.Components)
+            {
                 yield return child;
+                children = children.Concat(child.ChildrenQueue());
+            }
 
-            foreach (TAbstract child in components.SelectMany(x => x.ChildrenQueue()))
+            foreach (TAbstract child in children)
                 yield return child;
         }
 
