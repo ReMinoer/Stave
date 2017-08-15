@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+﻿using Diese.Collections;
 
 namespace Stave
 {
@@ -7,7 +7,7 @@ namespace Stave
         where TParent : class, TAbstract, IParent<TAbstract, TParent>
         where TComponent : class, TAbstract
     {
-        new IReadOnlyCollection<TComponent> Components { get; }
+        new IWrappedCollection<TComponent> Components { get; }
         void Add(TComponent item);
         bool Remove(TComponent item);
         void Clear();

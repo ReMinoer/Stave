@@ -10,10 +10,10 @@ namespace Stave
         where TComponent : class, TAbstract
     {
         private readonly ComponentList<TAbstract, TParent, TComponent> _componentList;
-        public IReadOnlyList<TComponent> Components { get; }
+        public IWrappedList<TComponent> Components { get; }
         internal override IEnumerable<TComponent> InternalComponents => Components;
         IEnumerable<TComponent> IParent<TAbstract, TParent, TComponent>.Components => Components;
-        IReadOnlyCollection<TComponent> IComposite<TAbstract, TParent, TComponent>.Components => Components;
+        IWrappedCollection<TComponent> IComposite<TAbstract, TParent, TComponent>.Components => Components;
 
         TComponent IOrderedComposite<TAbstract, TParent, TComponent>.this[int index]
         {
@@ -24,7 +24,7 @@ namespace Stave
         public OrderedComposite()
         {
             _componentList = new ComponentList<TAbstract, TParent, TComponent>(this);
-            Components = new ReadOnlyList<TComponent>(_componentList);
+            Components = new WrappedList<TComponent>(_componentList);
         }
 
         public void Add(TComponent item)

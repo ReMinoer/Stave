@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using Diese.Collections;
 using Stave.Base;
 
 namespace Stave
@@ -9,13 +10,13 @@ namespace Stave
         where TComponent : class, TAbstract
     {
         private readonly ComponentCollection<TAbstract, TParent, TComponent> _componentCollection;
-        public IReadOnlyCollection<TComponent> Components { get; }
+        public IWrappedCollection<TComponent> Components { get; }
         internal override IEnumerable<TComponent> InternalComponents => Components;
 
         protected Composite()
         {
             _componentCollection = new ComponentCollection<TAbstract, TParent, TComponent>(this);
-            Components = new Diese.Collections.ReadOnlyCollection<TComponent>(_componentCollection);
+            Components = new WrappedCollection<TComponent>(_componentCollection);
         }
 
         public virtual void Add(TComponent item)
