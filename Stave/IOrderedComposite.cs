@@ -2,10 +2,10 @@
 
 namespace Stave
 {
-    public interface IOrderedComposite<TAbstract, TParent, TComponent> : IComposite<TAbstract, TParent, TComponent>
-        where TAbstract : class, IComponent<TAbstract, TParent>
-        where TParent : class, TAbstract, IParent<TAbstract, TParent>
-        where TComponent : class, TAbstract
+    public interface IOrderedComposite<TBase, TContainer, TComponent> : IComposite<TBase, TContainer, TComponent>
+        where TBase : class, IComponent<TBase, TContainer>
+        where TContainer : class, TBase, IContainer<TBase, TContainer>
+        where TComponent : class, TBase
     {
         new IWrappedList<TComponent> Components { get; }
         TComponent this[int index] { get; set; }

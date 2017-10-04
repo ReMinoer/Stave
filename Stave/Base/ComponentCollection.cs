@@ -5,58 +5,53 @@ using System.Linq;
 
 namespace Stave.Base
 {
-    public class ComponentCollection<TAbstract, TParent, TComponent> : ICollection<TComponent>
-        where TAbstract : class, IComponent<TAbstract, TParent>
-        where TParent : class, TAbstract, IParent<TAbstract, TParent>
-        where TComponent : class, TAbstract
+    public class ComponentCollection<TBase, TContainer, TComponent> : ICollection<TComponent>
+        where TBase : class, IComponent<TBase, TContainer>
+        where TContainer : class, TBase, IContainer<TBase, TContainer>
+        where TComponent : class, TBase
     {
-        protected readonly IParent<TAbstract, TParent> Owner;
+        protected readonly TContainer Owner;
+
         protected readonly List<TComponent> Components;
         public int Count => Components.Count;
         public bool IsReadOnly => false;
 
-        public ComponentCollection(IParent<TAbstract, TParent> owner)
+        public ComponentCollection(TContainer owner)
         {
             Owner = owner;
             Components = new List<TComponent>();
         }
 
-        public void Add(TComponent item)
+        public void Add(TComponent item) => CheckAndAdd(item, Components.Add);
+
+        protected void CheckAndAdd(TComponent item, Action<TComponent> addAction)
         {
-            if (Owner == item)
+            if (item == null)
+                throw new ArgumentNullException();
+
+            if (item == Owner)
                 throw new InvalidOperationException("Item can't be a child of itself.");
 
-            var itemParent = item as TParent;
-            if (itemParent != null && Owner.ParentQueue().Contains(itemParent))
+            if (Contains(item))
+                return;
+
+            if (((IComponent<TBase>)Owner).ParentQueue().Contains(item))
                 throw new InvalidOperationException("Item can't be a child of this because it already exist among its parents.");
 
-            if (!Contains(item))
-                Components.Add(item);
-
-            item.Parent = Owner as TParent;
+            addAction(item);
+            item.Parent = Owner;
         }
 
         public bool Remove(TComponent item)
         {
+            if (item == null)
+                throw new ArgumentNullException();
+
             if (!Components.Remove(item))
                 return false;
 
             item.Parent = null;
             return true;
-        }
-
-        public void Replace(ref TComponent reference, TComponent newItem)
-        {
-            if (reference == newItem)
-                return;
-
-            if (reference != null)
-                Remove(reference);
-
-            reference = newItem;
-
-            if (reference != null)
-                Add(reference);
         }
 
         public void Clear()
@@ -67,22 +62,14 @@ namespace Stave.Base
 
         public bool Contains(TComponent item)
         {
+            if (item == null)
+                throw new ArgumentNullException();
+
             return Components.Contains(item);
         }
 
-        public IEnumerator<TComponent> GetEnumerator()
-        {
-            return Components.GetEnumerator();
-        }
-
-        IEnumerator IEnumerable.GetEnumerator()
-        {
-            return ((IEnumerable)Components).GetEnumerator();
-        }
-
-        void ICollection<TComponent>.CopyTo(TComponent[] array, int arrayIndex)
-        {
-            Components.CopyTo(array, arrayIndex);
-        }
+        public IEnumerator<TComponent> GetEnumerator() => Components.GetEnumerator();
+        IEnumerator IEnumerable.GetEnumerator() => ((IEnumerable)Components).GetEnumerator();
+        void ICollection<TComponent>.CopyTo(TComponent[] array, int arrayIndex) => throw new InvalidOperationException();
     }
 }

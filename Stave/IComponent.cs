@@ -1,12 +1,25 @@
-﻿using System.Collections.Generic;
+﻿using System.Collections;
+using System.Collections.Generic;
 
 namespace Stave
 {
-    public interface IComponent<out TAbstract, TParent>
-        where TAbstract : class, IComponent<TAbstract, TParent>
-        where TParent : class, TAbstract, IParent<TAbstract, TParent>
+    public interface IComponent
     {
-        TParent Parent { get; set; }
-        IEnumerable<TAbstract> Components { get; }
+        IComponent Parent { get; }
+        IEnumerable Components { get; }
+    }
+
+    public interface IComponent<out TBase> : IComponent
+        where TBase : class, IComponent<TBase>
+    {
+        new TBase Parent { get; }
+        new IEnumerable<TBase> Components { get; }
+    }
+
+    public interface IComponent<out TBase, TContainer> : IComponent<TBase>
+        where TBase : class, IComponent<TBase, TContainer>
+        where TContainer : class, TBase, IContainer<TBase, TContainer>
+    {
+        new TContainer Parent { get; set; }
     }
 }

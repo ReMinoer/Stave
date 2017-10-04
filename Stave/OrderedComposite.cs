@@ -4,72 +4,46 @@ using Stave.Base;
 
 namespace Stave
 {
-    public class OrderedComposite<TAbstract, TParent, TComponent> : ParentBase<TAbstract, TParent, TComponent>, IOrderedComposite<TAbstract, TParent, TComponent>
-        where TAbstract : class, IComponent<TAbstract, TParent>
-        where TParent : class, TAbstract, IParent<TAbstract, TParent>
-        where TComponent : class, TAbstract
+    public class OrderedComposite<TBase, TContainer, TComponent> : ContainerBase<TBase, TContainer, TComponent>, IOrderedComposite<TBase, TContainer, TComponent>
+        where TBase : class, IComponent<TBase, TContainer>
+        where TContainer : class, TBase, IContainer<TBase, TContainer>
+        where TComponent : class, TBase
     {
-        private readonly ComponentList<TAbstract, TParent, TComponent> _componentList;
+        private readonly ComponentList<TBase, TContainer, TComponent> _componentList;
         public IWrappedList<TComponent> Components { get; }
-        internal override IEnumerable<TComponent> InternalComponents => Components;
-        IEnumerable<TComponent> IParent<TAbstract, TParent, TComponent>.Components => Components;
-        IWrappedCollection<TComponent> IComposite<TAbstract, TParent, TComponent>.Components => Components;
 
-        TComponent IOrderedComposite<TAbstract, TParent, TComponent>.this[int index]
+        internal override bool InternalOpened => true;
+        internal override IEnumerable<TComponent> ReadOnlyComponents => Components;
+        IEnumerable<TComponent> IContainer<TBase, TContainer, TComponent>.Components => Components;
+        IWrappedCollection<TComponent> IComposite<TBase, TContainer, TComponent>.Components => Components;
+
+        TComponent IOrderedComposite<TBase, TContainer, TComponent>.this[int index]
         {
-            get { return _componentList[index]; }
-            set { _componentList[index] = value; }
+            get => _componentList[index];
+            set => _componentList[index] = value;
         }
 
         public OrderedComposite()
         {
-            _componentList = new ComponentList<TAbstract, TParent, TComponent>(this);
+            _componentList = new ComponentList<TBase, TContainer, TComponent>(Owner);
             Components = new WrappedList<TComponent>(_componentList);
         }
 
-        public void Add(TComponent item)
+        public OrderedComposite(TContainer owner)
+            : base(owner)
         {
-            _componentList.Add(item);
+            _componentList = new ComponentList<TBase, TContainer, TComponent>(Owner);
+            Components = new WrappedList<TComponent>(_componentList);
         }
 
-        public void Clear()
-        {
-            _componentList.Clear();
-        }
-
-        public bool Contains(TComponent item)
-        {
-            return _componentList.Contains(item);
-        }
-
-        public bool Remove(TComponent item)
-        {
-            return _componentList.Remove(item);
-        }
-
-        public int IndexOf(TComponent item)
-        {
-            return _componentList.IndexOf(item);
-        }
-
-        public void Insert(int index, TComponent item)
-        {
-            _componentList.Insert(index, item);
-        }
-
-        public void RemoveAt(int index)
-        {
-            _componentList.RemoveAt(index);
-        }
-
-        internal override sealed void Link(TComponent component)
-        {
-            Add(component);
-        }
-
-        internal override void Unlink(TComponent component)
-        {
-            Remove(component);
-        }
+        public void Add(TComponent item) => _componentList.Add(item);
+        public void Clear() => _componentList.Clear();
+        public bool Contains(TComponent item) => _componentList.Contains(item);
+        public bool Remove(TComponent item) => _componentList.Remove(item);
+        public int IndexOf(TComponent item) => _componentList.IndexOf(item);
+        public void Insert(int index, TComponent item) => _componentList.Insert(index, item);
+        public void RemoveAt(int index) => _componentList.RemoveAt(index);
+        protected override void AddChild(TComponent component) => Add(component);
+        protected override void RemoveChild(TComponent component) => Remove(component);
     }
 }

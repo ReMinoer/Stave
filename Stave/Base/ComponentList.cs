@@ -1,63 +1,33 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace Stave.Base
 {
-    public class ComponentList<TAbstract, TParent, TComponent> : ComponentCollection<TAbstract, TParent, TComponent>, IList<TComponent>
-        where TAbstract : class, IComponent<TAbstract, TParent>
-        where TParent : class, TAbstract, IParent<TAbstract, TParent>
-        where TComponent : class, TAbstract
+    public class ComponentList<TBase, TContainer, TComponent> : ComponentCollection<TBase, TContainer, TComponent>, IList<TComponent>
+        where TBase : class, IComponent<TBase, TContainer>
+        where TContainer : class, TBase, IContainer<TBase, TContainer>
+        where TComponent : class, TBase
     {
         public virtual TComponent this[int index]
         {
-            get { return Components[index]; }
-            set
-            {
-                if (value != null)
-                {
-                    if (Owner == value)
-                        throw new InvalidOperationException("Item can't be a child of itself.");
-
-                    var valueAsParent = value as TParent;
-                    if (valueAsParent != null && Owner.ParentQueue().Contains(valueAsParent))
-                        throw new InvalidOperationException("Item can't be a child of this because it already exist among its parents.");
-
-                    if (!Contains(value))
-                        Components.Add(value);
-                }
-
-                Components[index] = value;
-            }
+            get => Components[index];
+            set => CheckAndAdd(value, x => Components[index] = x);
         }
 
-        public ComponentList(IParent<TAbstract, TParent> owner)
+        public ComponentList(TContainer owner)
             : base(owner)
         {
         }
 
         public int IndexOf(TComponent item)
         {
+            if (item == null)
+                throw new ArgumentNullException();
+
             return Components.IndexOf(item);
         }
 
-        public virtual void Insert(int index, TComponent item)
-        {
-            if (Owner == item)
-                throw new InvalidOperationException("Item can't be a child of itself.");
-
-            var itemAsParent = item as TParent;
-            if (itemAsParent != null && Owner.ParentQueue().Contains(itemAsParent))
-                throw new InvalidOperationException("Item can't be a child of this because it is already among its parents.");
-
-            if (!Contains(item))
-                Components.Add(item);
-
-            Components.Insert(index, item);
-
-            if (item != null)
-                item.Parent = Owner as TParent;
-        }
+        public virtual void Insert(int index, TComponent item) => CheckAndAdd(item, x => Components.Insert(index, x));
 
         public virtual void RemoveAt(int index)
         {

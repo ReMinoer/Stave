@@ -38,7 +38,8 @@
     <Compile Include="Base\ComponentBase.cs" />
     <Compile Include="Base\ComponentCollection.cs" />
     <Compile Include="Base\ComponentList.cs" />
-    <Compile Include="Base\ParentBase.cs" />
+    <Compile Include="Base\ContainerBase.cs" />
+    <Compile Include="OpaqueContainer.cs" />
     <Compile Include="Component.cs" />
     <Compile Include="ComponentExtensions.cs" />
     <Compile Include="Composite.cs" />
@@ -48,12 +49,12 @@
     <Compile Include="Exceptions\ReadOnlyParentException.cs" />
     <Compile Include="IComponent.cs" />
     <Compile Include="IComposite.cs" />
-    <Compile Include="IContainer.cs" />
     <Compile Include="IDecorator.cs" />
     <Compile Include="IOrderedComposite.cs" />
-    <Compile Include="IParent.cs" />
+    <Compile Include="IContainer.cs" />
     <Compile Include="OrderedComposite.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="SealedOrderedComposite.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\External\Diese\Diese.Collections\Diese.Collections.csproj">

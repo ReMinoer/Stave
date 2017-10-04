@@ -1,32 +1,31 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using Stave.Base;
 
 namespace Stave
 {
-    public class Container<TBase, TContainer, TComponent> : ContainerBase<TBase, TContainer, TComponent>
+    public class OpaqueContainer<TBase, TContainer, TComponent> : ContainerBase<TBase, TContainer, TComponent>
         where TBase : class, IComponent<TBase, TContainer>
         where TContainer : class, TBase, IContainer<TBase, TContainer>
         where TComponent : class, TBase
     {
         protected readonly ComponentList<TBase, TContainer, TComponent> Components;
-        private readonly IReadOnlyCollection<TComponent> _readOnlyComponents;
 
         internal override bool InternalOpened => false;
-        internal override IEnumerable<TComponent> ReadOnlyComponents => _readOnlyComponents;
-
-        public Container()
+        internal override IEnumerable<TComponent> ReadOnlyComponents
         {
-            Components = new ComponentList<TBase, TContainer, TComponent>(Owner);
-            _readOnlyComponents = new ReadOnlyCollection<TComponent>(Components);
+            get { yield break; }
         }
 
-        public Container(TContainer owner)
+        public OpaqueContainer()
+        {
+            Components = new ComponentList<TBase, TContainer, TComponent>(Owner);
+        }
+
+        public OpaqueContainer(TContainer owner)
             : base(owner)
         {
             Components = new ComponentList<TBase, TContainer, TComponent>(Owner);
-            _readOnlyComponents = new ReadOnlyCollection<TComponent>(Components);
         }
 
         protected override sealed void AddChild(TComponent component) => throw new InvalidOperationException();
