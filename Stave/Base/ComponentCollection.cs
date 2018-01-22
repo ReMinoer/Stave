@@ -57,7 +57,11 @@ namespace Stave.Base
         public void Clear()
         {
             for (int i = Count; i > 0; i--)
-                Remove(Components[0]);
+            {
+                TComponent item = Components[0];
+                Components.Remove(item);
+                item.Parent = null;
+            }
         }
 
         public bool Contains(TComponent item)
