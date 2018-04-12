@@ -1,73 +1,11 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+<Project Sdk="Microsoft.NET.Sdk">
+
   <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{38A041E6-5AA9-4C22-B96F-35167F171959}</ProjectGuid>
-    <OutputType>Library</OutputType>
-    <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Stave</RootNamespace>
-    <AssemblyName>Stave</AssemblyName>
-    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
-    <FileAlignment>512</FileAlignment>
-    <TargetFrameworkProfile />
+    <TargetFramework>netstandard1.0</TargetFramework>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <DebugType>pdbonly</DebugType>
-    <Optimize>true</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-  </PropertyGroup>
+
   <ItemGroup>
-    <Reference Include="System" />
-    <Reference Include="System.Core" />
+    <ProjectReference Include="..\External\Diese\Diese.Collections\Diese.Collections.csproj" />
   </ItemGroup>
-  <ItemGroup>
-    <Compile Include="Base\ComponentBase.cs" />
-    <Compile Include="Base\ComponentCollection.cs" />
-    <Compile Include="Base\ComponentList.cs" />
-    <Compile Include="Base\ContainerBase.cs" />
-    <Compile Include="OpaqueContainer.cs" />
-    <Compile Include="Component.cs" />
-    <Compile Include="ComponentExtensions.cs" />
-    <Compile Include="Composite.cs" />
-    <Compile Include="Container.cs" />
-    <Compile Include="Decorator.cs" />
-    <Compile Include="Exceptions\InvalidChildException.cs" />
-    <Compile Include="Exceptions\ReadOnlyParentException.cs" />
-    <Compile Include="IComponent.cs" />
-    <Compile Include="IComposite.cs" />
-    <Compile Include="IDecorator.cs" />
-    <Compile Include="IOrderedComposite.cs" />
-    <Compile Include="IContainer.cs" />
-    <Compile Include="OrderedComposite.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="SealedOrderedComposite.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\External\Diese\Diese.Collections\Diese.Collections.csproj">
-      <Project>{8e354191-e8e5-498b-9c24-a6765da86417}</Project>
-      <Name>Diese.Collections</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
-       Other similar extension points exist, see Microsoft.Common.targets.
-  <Target Name="BeforeBuild">
-  </Target>
-  <Target Name="AfterBuild">
-  </Target>
-  -->
+
 </Project>
