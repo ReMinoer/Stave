@@ -5,7 +5,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\External\Diese\Diese.Collections\Diese.Collections.csproj" />
+    <PackageReference Include="ReMinoer.Diese.Collections" Version="0.1.0-alpha" />
   </ItemGroup>
 
 </Project>
