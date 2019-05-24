@@ -26,6 +26,8 @@ namespace Stave
         public OrderedComposite()
         {
             _componentList = new ComponentList<TBase, TContainer, TComponent>(Owner);
+            _componentList.ComponentAdded += OnComponentAdded;
+
             Components = new WrappedList<TComponent>(_componentList);
         }
 
@@ -33,6 +35,8 @@ namespace Stave
             : base(owner)
         {
             _componentList = new ComponentList<TBase, TContainer, TComponent>(Owner);
+            _componentList.ComponentAdded += OnComponentAdded;
+
             Components = new WrappedList<TComponent>(_componentList);
         }
 

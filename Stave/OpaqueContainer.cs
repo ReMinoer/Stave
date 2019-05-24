@@ -20,12 +20,14 @@ namespace Stave
         public OpaqueContainer()
         {
             Components = new ComponentList<TBase, TContainer, TComponent>(Owner);
+            Components.ComponentAdded += OnComponentAdded;
         }
 
         public OpaqueContainer(TContainer owner)
             : base(owner)
         {
             Components = new ComponentList<TBase, TContainer, TComponent>(Owner);
+            Components.ComponentAdded += OnComponentAdded;
         }
 
         protected override sealed void AddChild(TComponent component) => throw new InvalidOperationException();

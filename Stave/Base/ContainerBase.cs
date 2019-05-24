@@ -12,15 +12,17 @@ namespace Stave.Base
     {
         new protected readonly TContainer Owner;
 
-        bool IContainer<TBase>.Opened => InternalOpened;
+        bool IContainer.Opened => InternalOpened;
         internal abstract bool InternalOpened { get; }
 
         internal abstract IEnumerable<TComponent> ReadOnlyComponents { get; }
         internal override sealed IEnumerable<TBase> ReadOnlyBaseComponents => ReadOnlyComponents;
         IEnumerable<TComponent> IContainer<TBase, TContainer, TComponent>.Components => ReadOnlyComponents;
 
-        protected abstract void AddChild(TComponent child);
-        protected abstract void RemoveChild(TComponent child);
+        public event Event<TComponent> ComponentAdded;
+
+        private event Event<IComponent> ComponentAddedBase;
+        private event Event<TBase> ComponentAddedBaseBis;
 
         protected ContainerBase()
         {
@@ -35,7 +37,7 @@ namespace Stave.Base
             Owner = owner;
         }
 
-        private void Link(TComponent child)
+        private void Link(TComponent child) 
         {
             if (child == null)
                 throw new NullReferenceException();
@@ -54,11 +56,11 @@ namespace Stave.Base
             if (child == null)
                 throw new NullReferenceException();
 
-            if (!ReadOnlyComponents.Contains(child))
-                return;
-
             if (!InternalOpened)
                 throw new ReadOnlyParentException(ReadOnlyParent.Previous);
+
+            if (!ReadOnlyComponents.Contains(child))
+                return;
 
             RemoveChild(child);
         }
@@ -93,6 +95,18 @@ namespace Stave.Base
             return true;
         }
 
+        protected void OnComponentAdded(object sender, TComponent e)
+        {
+            ComponentAddedBase?.Invoke(Owner, e);
+            ComponentAddedBaseBis?.Invoke(Owner, e);
+            ComponentAdded?.Invoke(Owner, e);
+
+            OnComponentAddedBase(Owner, e);
+        }
+
+        protected abstract void AddChild(TComponent child);
+        protected abstract void RemoveChild(TComponent child);
+
         void IContainer<TBase>.Link(TBase child)
         {
             if (!(child is TComponent component))
@@ -116,5 +130,17 @@ namespace Stave.Base
         bool IContainer<TBase>.TryUnlink(TBase child) => child is TComponent component && TryUnlink(component);
         bool IContainer<TBase, TContainer, TComponent>.TryLink(TComponent child) => TryLink(child);
         bool IContainer<TBase, TContainer, TComponent>.TryUnlink(TComponent child) => TryUnlink(child);
+
+        event Event<IComponent> IContainer.ComponentAdded
+        {
+            add => ComponentAddedBase += value;
+            remove => ComponentAddedBase -= value;
+        }
+
+        event Event<TBase> IContainer<TBase>.ComponentAdded
+        {
+            add => ComponentAddedBaseBis += value;
+            remove => ComponentAddedBaseBis -= value;
+        }
     }
 }

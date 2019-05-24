@@ -29,6 +29,8 @@ namespace Stave
             : base(owner)
         {
             Components = new ComponentList<TBase, TContainer, TComponent>(Owner);
+            Components.ComponentAdded += OnComponentAdded;
+
             _wrappedComponents = new WrappedList<TComponent>(Components);
         }
 

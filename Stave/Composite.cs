@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Diese.Collections;
 using Stave.Base;
 
@@ -18,6 +19,8 @@ namespace Stave
         public Composite()
         {
             _componentCollection = new ComponentCollection<TBase, TContainer, TComponent>(Owner);
+            _componentCollection.ComponentAdded += OnComponentAdded;
+
             Components = new WrappedCollection<TComponent>(_componentCollection);
         }
 
@@ -25,6 +28,8 @@ namespace Stave
             : base(owner)
         {
             _componentCollection = new ComponentCollection<TBase, TContainer, TComponent>(Owner);
+            _componentCollection.ComponentAdded += OnComponentAdded;
+
             Components = new WrappedCollection<TComponent>(_componentCollection);
         }
 

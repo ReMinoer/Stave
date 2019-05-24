@@ -19,6 +19,8 @@ namespace Stave
         public Container()
         {
             Components = new ComponentList<TBase, TContainer, TComponent>(Owner);
+            Components.ComponentAdded += OnComponentAdded;
+
             _readOnlyComponents = new ReadOnlyCollection<TComponent>(Components);
         }
 
@@ -26,6 +28,8 @@ namespace Stave
             : base(owner)
         {
             Components = new ComponentList<TBase, TContainer, TComponent>(Owner);
+            Components.ComponentAdded += OnComponentAdded;
+
             _readOnlyComponents = new ReadOnlyCollection<TComponent>(Components);
         }
 

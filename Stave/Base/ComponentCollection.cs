@@ -16,6 +16,8 @@ namespace Stave.Base
         public int Count => Components.Count;
         public bool IsReadOnly => false;
 
+        public event EventHandler<TComponent> ComponentAdded;
+
         public ComponentCollection(TContainer owner)
         {
             Owner = owner;
@@ -40,6 +42,8 @@ namespace Stave.Base
 
             addAction(item);
             item.Parent = Owner;
+
+            ComponentAdded?.Invoke(this, item);
         }
 
         public bool Remove(TComponent item)

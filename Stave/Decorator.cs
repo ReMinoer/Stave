@@ -32,6 +32,7 @@ namespace Stave
 
                 _component = value;
                 _component.Parent = Owner;
+                OnComponentAdded(this, _component);
             }
         }
 
