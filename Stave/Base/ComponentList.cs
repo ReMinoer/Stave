@@ -11,7 +11,12 @@ namespace Stave.Base
         public virtual TComponent this[int index]
         {
             get => Components[index];
-            set => CheckAndAdd(value, x => Components[index] = x);
+            set => CheckAndAdd(value, x =>
+            {
+                while (index >= Count)
+                    Components.Add(null);
+                Components[index] = x;
+            });
         }
 
         public ComponentList(TContainer owner)
