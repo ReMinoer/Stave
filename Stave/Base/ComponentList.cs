@@ -1,9 +1,10 @@
 using System;
-using System.Collections.Generic;
+using System.Linq;
+using Diese.Collections.Observables;
 
 namespace Stave.Base
 {
-    public class ComponentList<TBase, TContainer, TComponent> : ComponentCollection<TBase, TContainer, TComponent>, IList<TComponent>
+    public class ComponentList<TBase, TContainer, TComponent> : ComponentCollection<TBase, TContainer, TComponent>, IObservableList<TComponent>
         where TBase : class, IComponent<TBase, TContainer>
         where TContainer : class, TBase, IContainer<TBase, TContainer>
         where TComponent : class, TBase
@@ -11,12 +12,20 @@ namespace Stave.Base
         public virtual TComponent this[int index]
         {
             get => Components[index];
-            set => CheckAndAdd(value, x =>
+            set
             {
-                while (index >= Count)
-                    Components.Add(null);
-                Components[index] = x;
-            });
+                int oldCount = Count;
+                CheckAndInsert(value,
+                    () =>
+                    {
+                        while (index >= Count)
+                            Components.Add(null);
+                        Components[index] = value;
+                    },
+                    () => CollectionChangedEventArgs.InsertRange(
+                        Components.Skip(index).Take(Math.Min(1, Count - oldCount)).ToArray(),
+                        Math.Min(index, oldCount)));
+            }
         }
 
         public ComponentList(TContainer owner)
@@ -32,7 +41,10 @@ namespace Stave.Base
             return Components.IndexOf(item);
         }
 
-        public virtual void Insert(int index, TComponent item) => CheckAndAdd(item, x => Components.Insert(index, x));
+        public virtual void Insert(int index, TComponent item)
+            => CheckAndInsert(item,
+                () => Components.Insert(index, item),
+                () => CollectionChangedEventArgs.Insert(item, index));
 
         public virtual void RemoveAt(int index)
         {

@@ -1,4 +1,4 @@
-﻿using Diese.Collections;
+﻿using Diese.Collections.Observables.ReadOnly;
 
 namespace Stave
 {
@@ -7,7 +7,7 @@ namespace Stave
         where TContainer : class, TBase, IContainer<TBase, TContainer>
         where TComponent : class, TBase
     {
-        new IWrappedCollection<TComponent> Components { get; }
+        new IWrappedObservableCollection<TComponent> Components { get; }
         void Add(TComponent item);
         bool Remove(TComponent item);
         void Clear();

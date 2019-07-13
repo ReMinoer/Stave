@@ -1,11 +1,14 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Collections.Specialized;
+using System.ComponentModel;
 using System.Linq;
+using Diese.Collections.Observables;
 
 namespace Stave.Base
 {
-    public class ComponentCollection<TBase, TContainer, TComponent> : ICollection<TComponent>
+    public class ComponentCollection<TBase, TContainer, TComponent> : IObservableCollection<TComponent>
         where TBase : class, IComponent<TBase, TContainer>
         where TContainer : class, TBase, IContainer<TBase, TContainer>
         where TComponent : class, TBase
@@ -14,9 +17,10 @@ namespace Stave.Base
 
         protected readonly List<TComponent> Components;
         public int Count => Components.Count;
-        public bool IsReadOnly => false;
 
         public event EventHandler<TComponent> ComponentAdded;
+        public event PropertyChangedEventHandler PropertyChanged;
+        public event NotifyCollectionChangedEventHandler CollectionChanged;
 
         public ComponentCollection(TContainer owner)
         {
@@ -24,9 +28,9 @@ namespace Stave.Base
             Components = new List<TComponent>();
         }
 
-        public void Add(TComponent item) => CheckAndAdd(item, Components.Add);
+        public void Add(TComponent item) => CheckAndInsert(item, () => Components.Add(item), () => CollectionChangedEventArgs.Add(item, Count));
 
-        protected void CheckAndAdd(TComponent item, Action<TComponent> addAction)
+        protected void CheckAndInsert(TComponent item, Action addAction, Func<NotifyCollectionChangedEventArgs> eventArgsFunc)
         {
             if (item == null)
                 throw new ArgumentNullException();
@@ -40,10 +44,11 @@ namespace Stave.Base
             if (((IComponent<TBase>)Owner).ParentQueue().Contains(item))
                 throw new InvalidOperationException("Item can't be a child of this because it already exist among its parents.");
 
-            addAction(item);
+            addAction();
             item.Parent = Owner;
 
             ComponentAdded?.Invoke(this, item);
+            CollectionChanged?.Invoke(this, eventArgsFunc());
         }
 
         public bool Remove(TComponent item)
@@ -51,21 +56,28 @@ namespace Stave.Base
             if (item == null)
                 throw new ArgumentNullException();
 
-            if (!Components.Remove(item))
+            int index = Components.IndexOf(item);
+            if (index == -1)
                 return false;
 
+            Components.RemoveAt(index);
             item.Parent = null;
+
+            CollectionChanged?.Invoke(this, CollectionChangedEventArgs.Remove(item, index));
             return true;
         }
 
         public void Clear()
         {
-            for (int i = Count; i > 0; i--)
+            int count = Count;
+            for (int i = 0; i < count; i++)
             {
-                TComponent item = Components[0];
-                Components.Remove(item);
-                item.Parent = null;
+                TComponent component = Components[0];
+                Components.RemoveAt(0);
+                component.Parent = null;
             }
+
+            CollectionChanged?.Invoke(this, CollectionChangedEventArgs.Clear());
         }
 
         public bool Contains(TComponent item)
@@ -75,9 +87,10 @@ namespace Stave.Base
 
             return Components.Contains(item);
         }
-
+        
+        bool ICollection<TComponent>.IsReadOnly => false;
+        void ICollection<TComponent>.CopyTo(TComponent[] array, int arrayIndex) => throw new InvalidOperationException();
         public IEnumerator<TComponent> GetEnumerator() => Components.GetEnumerator();
         IEnumerator IEnumerable.GetEnumerator() => ((IEnumerable)Components).GetEnumerator();
-        void ICollection<TComponent>.CopyTo(TComponent[] array, int arrayIndex) => throw new InvalidOperationException();
     }
 }

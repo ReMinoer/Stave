@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-using Diese.Collections;
+using Diese.Collections.Observables.ReadOnly;
 using Stave.Base;
 
 namespace Stave
@@ -11,13 +11,13 @@ namespace Stave
     {
         public ComponentList<TBase, TContainer, TComponent> Components { get; }
 
-        private readonly IWrappedList<TComponent> _wrappedComponents;
-        IWrappedList<TComponent> IOrderedComposite<TBase, TContainer, TComponent>.Components => _wrappedComponents;
+        private readonly IWrappedObservableList<TComponent> _wrappedComponents;
+        IWrappedObservableList<TComponent> IOrderedComposite<TBase, TContainer, TComponent>.Components => _wrappedComponents;
 
         internal override bool InternalOpened => true;
         internal override IEnumerable<TComponent> ReadOnlyComponents => _wrappedComponents;
         IEnumerable<TComponent> IContainer<TBase, TContainer, TComponent>.Components => _wrappedComponents;
-        IWrappedCollection<TComponent> IComposite<TBase, TContainer, TComponent>.Components => _wrappedComponents;
+        IWrappedObservableCollection<TComponent> IComposite<TBase, TContainer, TComponent>.Components => _wrappedComponents;
 
         TComponent IOrderedComposite<TBase, TContainer, TComponent>.this[int index]
         {
@@ -31,7 +31,7 @@ namespace Stave
             Components = new ComponentList<TBase, TContainer, TComponent>(Owner);
             Components.ComponentAdded += OnComponentAdded;
 
-            _wrappedComponents = new WrappedList<TComponent>(Components);
+            _wrappedComponents = new WrappedObservableList<TComponent>(Components, Add);
         }
 
         public void Add(TComponent item) => Components.Add(item);

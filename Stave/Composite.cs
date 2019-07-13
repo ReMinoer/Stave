@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-using Diese.Collections;
+using Diese.Collections.Observables.ReadOnly;
 using Stave.Base;
 
 namespace Stave
@@ -10,7 +10,7 @@ namespace Stave
         where TComponent : class, TBase
     {
         private readonly ComponentCollection<TBase, TContainer, TComponent> _componentCollection;
-        public IWrappedCollection<TComponent> Components { get; }
+        public IWrappedObservableCollection<TComponent> Components { get; }
 
         internal override bool InternalOpened => true;
         internal override IEnumerable<TComponent> ReadOnlyComponents => Components;
@@ -20,7 +20,7 @@ namespace Stave
             _componentCollection = new ComponentCollection<TBase, TContainer, TComponent>(Owner);
             _componentCollection.ComponentAdded += OnComponentAdded;
 
-            Components = new WrappedCollection<TComponent>(_componentCollection);
+            Components = new WrappedObservableCollection<TComponent>(_componentCollection, Add);
         }
 
         public Composite(TContainer owner)
@@ -29,7 +29,7 @@ namespace Stave
             _componentCollection = new ComponentCollection<TBase, TContainer, TComponent>(Owner);
             _componentCollection.ComponentAdded += OnComponentAdded;
 
-            Components = new WrappedCollection<TComponent>(_componentCollection);
+            Components = new WrappedObservableCollection<TComponent>(_componentCollection, Add);
         }
 
         public virtual void Add(TComponent item) => _componentCollection.Add(item);

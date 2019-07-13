@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
+using Diese.Collections.Observables.ReadOnly;
 using Stave.Base;
 
 namespace Stave
@@ -21,7 +21,7 @@ namespace Stave
             Components = new ComponentList<TBase, TContainer, TComponent>(Owner);
             Components.ComponentAdded += OnComponentAdded;
 
-            _readOnlyComponents = new ReadOnlyCollection<TComponent>(Components);
+            _readOnlyComponents = new ReadOnlyObservableCollection<TComponent>(Components);
         }
 
         public Container(TContainer owner)
@@ -30,7 +30,7 @@ namespace Stave
             Components = new ComponentList<TBase, TContainer, TComponent>(Owner);
             Components.ComponentAdded += OnComponentAdded;
 
-            _readOnlyComponents = new ReadOnlyCollection<TComponent>(Components);
+            _readOnlyComponents = new ReadOnlyObservableCollection<TComponent>(Components);
         }
 
         protected override sealed void AddChild(TComponent component) => throw new InvalidOperationException();
