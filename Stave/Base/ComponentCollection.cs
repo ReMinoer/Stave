@@ -41,7 +41,7 @@ namespace Stave.Base
             if (Contains(item))
                 return;
 
-            if (((IComponent<TBase>)Owner).ParentQueue().Contains(item))
+            if (((IComponent<TBase>)Owner).AllParents().Contains(item))
                 throw new InvalidOperationException("Item can't be a child of this because it already exist among its parents.");
 
             addAction();

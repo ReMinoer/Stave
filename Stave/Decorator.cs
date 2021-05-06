@@ -27,7 +27,7 @@ namespace Stave
                 if (value == Owner)
                     throw new InvalidOperationException("Item can't be a child of itself.");
 
-                if (((IComponent<TBase>)Owner).ParentQueue().Contains(value))
+                if (((IComponent<TBase>)Owner).AllParents().Contains(value))
                     throw new InvalidOperationException("Item can't be a child of this because it already exist among its parents.");
 
                 _component = value;
