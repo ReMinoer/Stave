@@ -61,5 +61,32 @@ namespace Stave
 
             return Sequence.Aggregate(component, x => x.Parent);
         }
+
+        static public TBase RootParent<TBase>(this IComponent<TBase> component)
+            where TBase : class, IComponent<TBase>
+        {
+            TBase root = component.Parent;
+            if (root is null)
+                return null;
+
+            while (root.Parent != null)
+                root = root.Parent;
+
+            return root;
+        }
+
+        static public TContainer RootParent<TBase, TContainer>(this IComponent<TBase, TContainer> component)
+            where TBase : class, IComponent<TBase, TContainer>
+            where TContainer : class, TBase, IContainer<TBase, TContainer>
+        {
+            TContainer root = component.Parent;
+            if (root is null)
+                return null;
+
+            while (root.Parent != null)
+                root = root.Parent;
+
+            return root;
+        }
     }
 }
