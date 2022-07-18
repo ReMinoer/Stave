@@ -13,42 +13,51 @@ namespace Stave.Base
         where TContainer : class, TBase, IContainer<TBase, TContainer>
         where TComponent : class, TBase
     {
-        protected readonly TContainer Owner;
+        private readonly TContainer _owner;
+        private readonly Action<IComponentsChangedEventArgs<TBase, TContainer, TComponent>> _raiseComponentsChanged;
 
         protected readonly List<TComponent> Components;
         public int Count => Components.Count;
-
-        public event EventHandler<TComponent> ComponentAdded;
+        
         public event PropertyChangedEventHandler PropertyChanged;
         public event NotifyCollectionChangedEventHandler CollectionChanged;
 
-        public ComponentCollection(TContainer owner)
+        public ComponentCollection(TContainer owner, Action<IComponentsChangedEventArgs<TBase, TContainer, TComponent>> raiseComponentsChanged)
         {
-            Owner = owner;
+            _owner = owner;
+            _raiseComponentsChanged = raiseComponentsChanged;
+
             Components = new List<TComponent>();
         }
 
-        public void Add(TComponent item) => CheckAndInsert(item, () => Components.Add(item), () => CollectionChangedEventArgs.Add(item, Count));
+        public void Add(TComponent item)
+        {
+            CheckAndInsert(item,
+                () => Components.Add(item),
+                () => CollectionChangedEventArgs.Add(item, Count));
+        }
 
-        protected void CheckAndInsert(TComponent item, Action addAction, Func<NotifyCollectionChangedEventArgs> eventArgsFunc)
+        protected void CheckAndInsert(TComponent item,
+            Action addAction,
+            Func<NotifyCollectionChangedEventArgs> collectionEventArgsFunc)
         {
             if (item == null)
                 throw new ArgumentNullException();
 
-            if (item == Owner)
+            if (item == _owner)
                 throw new InvalidOperationException("Item can't be a child of itself.");
 
             if (Contains(item))
                 return;
 
-            if (((IComponent<TBase>)Owner).AllParents().Contains(item))
+            if (((IComponent<TBase>)_owner).AllParents().Contains(item))
                 throw new InvalidOperationException("Item can't be a child of this because it already exist among its parents.");
 
             addAction();
-            item.Parent = Owner;
+            item.Parent = _owner;
 
-            ComponentAdded?.Invoke(this, item);
-            CollectionChanged?.Invoke(this, eventArgsFunc());
+            CollectionChanged?.Invoke(this, collectionEventArgsFunc());
+            _raiseComponentsChanged(ComponentsChangedEventArgs<TBase, TContainer, TComponent>.Add(_owner, item));
         }
 
         public bool Remove(TComponent item)
@@ -64,20 +73,28 @@ namespace Stave.Base
             item.Parent = null;
 
             CollectionChanged?.Invoke(this, CollectionChangedEventArgs.Remove(item, index));
+            _raiseComponentsChanged(ComponentsChangedEventArgs<TBase, TContainer, TComponent>.Remove(_owner, item));
             return true;
         }
 
         public void Clear()
         {
+            var removedComponents = new List<TComponent>();
+
             int count = Count;
             for (int i = 0; i < count; i++)
             {
                 TComponent component = Components[0];
                 Components.RemoveAt(0);
                 component.Parent = null;
+
+                removedComponents.Add(component);
             }
 
             CollectionChanged?.Invoke(this, CollectionChangedEventArgs.Clear());
+
+            foreach (TComponent removedComponent in removedComponents)
+                _raiseComponentsChanged(ComponentsChangedEventArgs<TBase, TContainer, TComponent>.Remove(_owner, removedComponent));
         }
 
         public bool Contains(TComponent item)

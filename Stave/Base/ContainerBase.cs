@@ -19,10 +19,11 @@ namespace Stave.Base
         internal override sealed IEnumerable<TBase> ReadOnlyBaseComponents => ReadOnlyComponents;
         IEnumerable<TComponent> IContainer<TBase, TContainer, TComponent>.Components => ReadOnlyComponents;
 
-        public event Event<TComponent> ComponentAdded;
+        public event Event<IComponentsChangedEventArgs<TBase, TContainer, TComponent>> ComponentsChanged;
 
-        private event Event<IComponent> ComponentAddedBase;
-        private event Event<TBase> ComponentAddedBaseBis;
+        private event Event<IComponentsChangedEventArgs> ComponentsChangedT0;
+        private event Event<IComponentsChangedEventArgs<TBase>> ComponentsChangedT1;
+        private event Event<IComponentsChangedEventArgs<TBase, TContainer>> ComponentsChangedT2;
 
         protected ContainerBase()
         {
@@ -95,13 +96,14 @@ namespace Stave.Base
             return true;
         }
 
-        protected void OnComponentAdded(object sender, TComponent e)
-        {
-            ComponentAddedBase?.Invoke(Owner, e);
-            ComponentAddedBaseBis?.Invoke(Owner, e);
-            ComponentAdded?.Invoke(Owner, e);
+        internal void RaiseComponentsChanged(IComponentsChangedEventArgs<TBase, TContainer, TComponent> e)
+        { 
+            ComponentsChangedT0?.Invoke(Owner, e);
+            ComponentsChangedT1?.Invoke(Owner, e);
+            ComponentsChangedT2?.Invoke(Owner, e);
+            ComponentsChanged?.Invoke(Owner, e);
 
-            OnComponentAddedBase(Owner, e);
+            RaiseHierarchyComponentsChanged(e);
         }
 
         protected abstract void AddChild(TComponent child);
@@ -131,16 +133,22 @@ namespace Stave.Base
         bool IContainer<TBase, TContainer, TComponent>.TryLink(TComponent child) => TryLink(child);
         bool IContainer<TBase, TContainer, TComponent>.TryUnlink(TComponent child) => TryUnlink(child);
 
-        event Event<IComponent> IContainer.ComponentAdded
+        event Event<IComponentsChangedEventArgs> IContainer.ComponentsChanged
         {
-            add => ComponentAddedBase += value;
-            remove => ComponentAddedBase -= value;
+            add => ComponentsChangedT0 += value;
+            remove => ComponentsChangedT0 -= value;
         }
 
-        event Event<TBase> IContainer<TBase>.ComponentAdded
+        event Event<IComponentsChangedEventArgs<TBase>> IContainer<TBase>.ComponentsChanged
         {
-            add => ComponentAddedBaseBis += value;
-            remove => ComponentAddedBaseBis -= value;
+            add => ComponentsChangedT1 += value;
+            remove => ComponentsChangedT1 -= value;
+        }
+
+        event Event<IComponentsChangedEventArgs<TBase, TContainer>> IContainer<TBase, TContainer>.ComponentsChanged
+        {
+            add => ComponentsChangedT2 += value;
+            remove => ComponentsChangedT2 -= value;
         }
     }
 }

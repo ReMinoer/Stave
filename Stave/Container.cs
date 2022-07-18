@@ -18,18 +18,14 @@ namespace Stave
 
         public Container()
         {
-            Components = new ComponentList<TBase, TContainer, TComponent>(Owner);
-            Components.ComponentAdded += OnComponentAdded;
-
+            Components = new ComponentList<TBase, TContainer, TComponent>(Owner, RaiseComponentsChanged);
             _readOnlyComponents = new ReadOnlyObservableCollection<TComponent>(Components);
         }
 
         public Container(TContainer owner)
             : base(owner)
         {
-            Components = new ComponentList<TBase, TContainer, TComponent>(Owner);
-            Components.ComponentAdded += OnComponentAdded;
-
+            Components = new ComponentList<TBase, TContainer, TComponent>(Owner, RaiseComponentsChanged);
             _readOnlyComponents = new ReadOnlyObservableCollection<TComponent>(Components);
         }
 

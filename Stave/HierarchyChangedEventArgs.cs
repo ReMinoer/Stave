@@ -4,17 +4,24 @@
         where TBase : class, IComponent<TBase, TContainer>
         where TContainer : class, TBase, IContainer<TBase, TContainer>
     {
-        public TContainer LinkedParent { get; }
-        public TBase LinkedChild { get; }
+        public HierarchyChangeType ChangeType { get; }
+        public TContainer Parent { get; }
+        public TBase Child { get; }
 
-        public HierarchyChangedEventArgs(TContainer linkedParent, TBase linkedChild)
+        static public HierarchyChangedEventArgs<TBase, TContainer> Link(TContainer parent, TBase child)
+            => new HierarchyChangedEventArgs<TBase, TContainer>(HierarchyChangeType.Link, parent, child);
+        static public HierarchyChangedEventArgs<TBase, TContainer> Unlink(TContainer parent, TBase child)
+            => new HierarchyChangedEventArgs<TBase, TContainer>(HierarchyChangeType.Unlink, parent, child);
+
+        private HierarchyChangedEventArgs(HierarchyChangeType changeType, TContainer linkedParent, TBase linkedChild)
         {
-            LinkedParent = linkedParent;
-            LinkedChild = linkedChild;
+            ChangeType = changeType;
+            Parent = linkedParent;
+            Child = linkedChild;
         }
 
-        TBase IHierarchyChangedEventArgs<TBase>.LinkedParent => LinkedParent;
-        IComponent IHierarchyChangedEventArgs.LinkedParent => LinkedParent;
-        IComponent IHierarchyChangedEventArgs.LinkedChild => LinkedChild;
+        TBase IHierarchyChangedEventArgs<TBase>.Parent => Parent;
+        IComponent IHierarchyChangedEventArgs.Parent => Parent;
+        IComponent IHierarchyChangedEventArgs.Child => Child;
     }
 }

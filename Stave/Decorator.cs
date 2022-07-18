@@ -29,10 +29,10 @@ namespace Stave
 
                 if (((IComponent<TBase>)Owner).AllParents().Contains(value))
                     throw new InvalidOperationException("Item can't be a child of this because it already exist among its parents.");
-
+                
                 _component = value;
                 _component.Parent = Owner;
-                OnComponentAdded(this, _component);
+                RaiseComponentsChanged(ComponentsChangedEventArgs<TBase, TContainer, TComponent>.Add(Owner, _component));
             }
         }
 
@@ -59,7 +59,11 @@ namespace Stave
         public TComponent Unlink()
         {
             TComponent component = Component;
-            RemoveChild(Component);
+
+            _component.Parent = null;
+            _component = null;
+            RaiseComponentsChanged(ComponentsChangedEventArgs<TBase, TContainer, TComponent>.Remove(Owner, component));
+
             return component;
         }
 
@@ -70,7 +74,7 @@ namespace Stave
 
         protected override sealed void RemoveChild(TComponent component)
         {
-            Component = null;
+            Unlink();
         }
     }
 }

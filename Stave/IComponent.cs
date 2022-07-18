@@ -9,7 +9,7 @@ namespace Stave
         IEnumerable Components { get; }
         event Event<IComponent> ParentChanged;
         event Event<IHierarchyChangedEventArgs> HierarchyChanged;
-        event Event<IHierarchyComponentAddedEventArgs> HierarchyComponentAdded;
+        event Event<IComponentsChangedEventArgs> HierarchyComponentsChanged;
     }
 
     public interface IComponent<out TBase> : IComponent
@@ -19,7 +19,7 @@ namespace Stave
         new IEnumerable<TBase> Components { get; }
         new event Event<TBase> ParentChanged;
         new event Event<IHierarchyChangedEventArgs<TBase>> HierarchyChanged;
-        new event Event<IHierarchyComponentAddedEventArgs<TBase>> HierarchyComponentAdded;
+        new event Event<IComponentsChangedEventArgs<TBase>> HierarchyComponentsChanged;
     }
 
     public interface IComponent<out TBase, TContainer> : IComponent<TBase>
@@ -29,6 +29,6 @@ namespace Stave
         new TContainer Parent { get; set; }
         new event Event<TContainer> ParentChanged;
         new event Event<IHierarchyChangedEventArgs<TBase, TContainer>> HierarchyChanged;
-        new event Event<IHierarchyComponentAddedEventArgs<TBase, TContainer>> HierarchyComponentAdded;
+        new event Event<IComponentsChangedEventArgs<TBase, TContainer>> HierarchyComponentsChanged;
     }
 }

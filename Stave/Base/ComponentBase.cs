@@ -22,9 +22,17 @@ namespace Stave.Base
 
                 if (_parent != null)
                 {
-                    _parent.HierarchyComponentAdded -= OnParentHierarchyComponentAdded;
+                    _parent.HierarchyComponentsChanged -= OnParentHierarchyComponentsChanged;
                     _parent.HierarchyChanged -= OnParentHierarchyChanged;
                     _parent.Unlink(Owner);
+
+                    HierarchyChangedEventArgs<TBase, TContainer> eventArgs = null;
+                    HierarchyChangedEventArgs<TBase, TContainer> GetEventArgs()
+                        => eventArgs ?? (eventArgs = HierarchyChangedEventArgs<TBase, TContainer>.Unlink(_parent, Owner));
+
+                    HierarchyChangedT0?.Invoke(Owner, GetEventArgs());
+                    HierarchyChangedT1?.Invoke(Owner, GetEventArgs());
+                    HierarchyChanged?.Invoke(Owner, GetEventArgs());
                 }
 
                 _parent = value;
@@ -33,20 +41,20 @@ namespace Stave.Base
                 {
                     _parent.Link(Owner);
                     _parent.HierarchyChanged += OnParentHierarchyChanged;
-                    _parent.HierarchyComponentAdded += OnParentHierarchyComponentAdded;
+                    _parent.HierarchyComponentsChanged += OnParentHierarchyComponentsChanged;
+
+                    HierarchyChangedEventArgs<TBase, TContainer> eventArgs = null;
+                    HierarchyChangedEventArgs<TBase, TContainer> GetEventArgs()
+                        => eventArgs ?? (eventArgs = HierarchyChangedEventArgs<TBase, TContainer>.Link(_parent, Owner));
+
+                    HierarchyChangedT0?.Invoke(Owner, GetEventArgs());
+                    HierarchyChangedT1?.Invoke(Owner, GetEventArgs());
+                    HierarchyChanged?.Invoke(Owner, GetEventArgs());
                 }
 
-                ParentChangedBase?.Invoke(Owner, value);
-                ParentChangedBaseBis?.Invoke(Owner, value);
+                ParentChangedT0?.Invoke(Owner, value);
+                ParentChangedT1?.Invoke(Owner, value);
                 ParentChanged?.Invoke(Owner, value);
-
-                HierarchyChangedEventArgs<TBase, TContainer> eventArgs = null;
-                HierarchyChangedEventArgs<TBase, TContainer> GetEventArgs()
-                    => eventArgs ?? (eventArgs = new HierarchyChangedEventArgs<TBase, TContainer>(value, Owner));
-
-                HierarchyChangedBase?.Invoke(Owner, GetEventArgs());
-                HierarchyChangedBaseBis?.Invoke(Owner, GetEventArgs());
-                HierarchyChanged?.Invoke(Owner, GetEventArgs());
             }
         }
 
@@ -58,14 +66,14 @@ namespace Stave.Base
 
         public event Event<TContainer> ParentChanged;
         public event Event<IHierarchyChangedEventArgs<TBase, TContainer>> HierarchyChanged;
-        public event Event<IHierarchyComponentAddedEventArgs<TBase, TContainer>> HierarchyComponentAdded;
+        public event Event<IComponentsChangedEventArgs<TBase, TContainer>> HierarchyComponentsChanged;
 
-        private event Event<IComponent> ParentChangedBase;
-        private event Event<TBase> ParentChangedBaseBis;
-        private event Event<IHierarchyChangedEventArgs> HierarchyChangedBase;
-        private event Event<IHierarchyChangedEventArgs<TBase>> HierarchyChangedBaseBis;
-        private event Event<IHierarchyComponentAddedEventArgs> HierarchyComponentAddedBase;
-        private event Event<IHierarchyComponentAddedEventArgs<TBase>> HierarchyComponentAddedBaseBis;
+        private event Event<IComponent> ParentChangedT0;
+        private event Event<TBase> ParentChangedT1;
+        private event Event<IHierarchyChangedEventArgs> HierarchyChangedT0;
+        private event Event<IHierarchyChangedEventArgs<TBase>> HierarchyChangedT1;
+        private event Event<IComponentsChangedEventArgs> HierarchyComponentsChangedT0;
+        private event Event<IComponentsChangedEventArgs<TBase>> HierarchyComponentsChangedT1;
 
         protected ComponentBase()
         {
@@ -81,63 +89,57 @@ namespace Stave.Base
 
         private void OnParentHierarchyChanged(object sender, IHierarchyChangedEventArgs<TBase, TContainer> e)
         {
-            HierarchyChangedBase?.Invoke(Owner, e);
-            HierarchyChangedBaseBis?.Invoke(Owner, e);
+            HierarchyChangedT0?.Invoke(Owner, e);
+            HierarchyChangedT1?.Invoke(Owner, e);
             HierarchyChanged?.Invoke(Owner, e);
         }
 
-        private void OnParentHierarchyComponentAdded(object sender, IHierarchyComponentAddedEventArgs<TBase, TContainer> e)
+        private void OnParentHierarchyComponentsChanged(object sender, IComponentsChangedEventArgs<TBase, TContainer> e)
         {
-            HierarchyComponentAddedBase?.Invoke(Owner, e);
-            HierarchyComponentAddedBaseBis?.Invoke(Owner, e);
-            HierarchyComponentAdded?.Invoke(Owner, e);
+            RaiseHierarchyComponentsChanged(e);
         }
 
-        protected void OnComponentAddedBase(TContainer containerOwner, TBase addedComponent)
+        protected void RaiseHierarchyComponentsChanged(IComponentsChangedEventArgs<TBase, TContainer> e)
         {
-            HierarchyComponentAddedEventArgs<TBase, TContainer> eventArgs = null;
-            HierarchyComponentAddedEventArgs<TBase, TContainer> GetEventArgs()
-                => eventArgs ?? (eventArgs = new HierarchyComponentAddedEventArgs<TBase, TContainer>(containerOwner, addedComponent));
-
-            HierarchyComponentAddedBase?.Invoke(Owner, GetEventArgs());
-            HierarchyComponentAddedBaseBis?.Invoke(Owner, GetEventArgs());
-            HierarchyComponentAdded?.Invoke(Owner, GetEventArgs());
+            HierarchyComponentsChangedT0?.Invoke(Owner, e);
+            HierarchyComponentsChangedT1?.Invoke(Owner, e);
+            HierarchyComponentsChanged?.Invoke(Owner, e);
         }
 
         event Event<IComponent> IComponent.ParentChanged
         {
-            add => ParentChangedBase += value;
-            remove => ParentChangedBase -= value;
+            add => ParentChangedT0 += value;
+            remove => ParentChangedT0 -= value;
         }
 
         event Event<IHierarchyChangedEventArgs> IComponent.HierarchyChanged
         {
-            add => HierarchyChangedBase += value;
-            remove => HierarchyChangedBase -= value;
+            add => HierarchyChangedT0 += value;
+            remove => HierarchyChangedT0 -= value;
         }
 
         event Event<TBase> IComponent<TBase>.ParentChanged
         {
-            add => ParentChangedBaseBis += value;
-            remove => ParentChangedBaseBis -= value;
+            add => ParentChangedT1 += value;
+            remove => ParentChangedT1 -= value;
         }
 
         event Event<IHierarchyChangedEventArgs<TBase>> IComponent<TBase>.HierarchyChanged
         {
-            add => HierarchyChangedBaseBis += value;
-            remove => HierarchyChangedBaseBis -= value;
+            add => HierarchyChangedT1 += value;
+            remove => HierarchyChangedT1 -= value;
         }
 
-        event Event<IHierarchyComponentAddedEventArgs> IComponent.HierarchyComponentAdded
+        event Event<IComponentsChangedEventArgs> IComponent.HierarchyComponentsChanged
         {
-            add => HierarchyComponentAddedBase += value;
-            remove => HierarchyComponentAddedBase -= value;
+            add => HierarchyComponentsChangedT0 += value;
+            remove => HierarchyComponentsChangedT0 -= value;
         }
 
-        event Event<IHierarchyComponentAddedEventArgs<TBase>> IComponent<TBase>.HierarchyComponentAdded
+        event Event<IComponentsChangedEventArgs<TBase>> IComponent<TBase>.HierarchyComponentsChanged
         {
-            add => HierarchyComponentAddedBaseBis += value;
-            remove => HierarchyComponentAddedBaseBis -= value;
+            add => HierarchyComponentsChangedT1 += value;
+            remove => HierarchyComponentsChangedT1 -= value;
         }
     }
 }

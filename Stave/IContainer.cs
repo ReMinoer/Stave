@@ -5,7 +5,7 @@ namespace Stave
     public interface IContainer : IComponent
     {
         bool Opened { get; }
-        event Event<IComponent> ComponentAdded;
+        event Event<IComponentsChangedEventArgs> ComponentsChanged;
     }
 
     public interface IContainer<TBase> : IContainer, IComponent<TBase>
@@ -15,13 +15,14 @@ namespace Stave
         void Unlink(TBase child);
         bool TryLink(TBase child);
         bool TryUnlink(TBase child);
-        new event Event<TBase> ComponentAdded;
+        new event Event<IComponentsChangedEventArgs<TBase>> ComponentsChanged;
     }
 
     public interface IContainer<TBase, TContainer> : IContainer<TBase>, IComponent<TBase, TContainer>
         where TBase : class, IComponent<TBase, TContainer>
         where TContainer : class, TBase, IContainer<TBase, TContainer>
     {
+        new event Event<IComponentsChangedEventArgs<TBase, TContainer>> ComponentsChanged;
     }
 
     public interface IContainer<TBase, TContainer, TComponent> : IContainer<TBase, TContainer>
@@ -34,6 +35,6 @@ namespace Stave
         void Unlink(TComponent child);
         bool TryLink(TComponent child);
         bool TryUnlink(TComponent child);
-        new event Event<TComponent> ComponentAdded;
+        new event Event<IComponentsChangedEventArgs<TBase, TContainer, TComponent>> ComponentsChanged;
     }
 }

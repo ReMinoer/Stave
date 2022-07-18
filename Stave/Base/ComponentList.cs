@@ -28,8 +28,8 @@ namespace Stave.Base
             }
         }
 
-        public ComponentList(TContainer owner)
-            : base(owner)
+        public ComponentList(TContainer owner, Action<IComponentsChangedEventArgs<TBase, TContainer, TComponent>> raiseComponentsChanged)
+            : base(owner, raiseComponentsChanged)
         {
         }
 

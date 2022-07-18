@@ -25,18 +25,14 @@ namespace Stave
 
         public OrderedComposite()
         {
-            _componentList = new ComponentList<TBase, TContainer, TComponent>(Owner);
-            _componentList.ComponentAdded += OnComponentAdded;
-
+            _componentList = new ComponentList<TBase, TContainer, TComponent>(Owner, RaiseComponentsChanged);
             Components = new WrappedObservableList<TComponent>(_componentList, Add);
         }
 
         public OrderedComposite(TContainer owner)
             : base(owner)
         {
-            _componentList = new ComponentList<TBase, TContainer, TComponent>(Owner);
-            _componentList.ComponentAdded += OnComponentAdded;
-
+            _componentList = new ComponentList<TBase, TContainer, TComponent>(Owner, RaiseComponentsChanged);
             Components = new WrappedObservableList<TComponent>(_componentList, Add);
         }
 

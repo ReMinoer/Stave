@@ -17,18 +17,14 @@ namespace Stave
 
         public Composite()
         {
-            _componentCollection = new ComponentCollection<TBase, TContainer, TComponent>(Owner);
-            _componentCollection.ComponentAdded += OnComponentAdded;
-
+            _componentCollection = new ComponentCollection<TBase, TContainer, TComponent>(Owner, RaiseComponentsChanged);
             Components = new WrappedObservableCollection<TComponent>(_componentCollection, Add);
         }
 
         public Composite(TContainer owner)
             : base(owner)
         {
-            _componentCollection = new ComponentCollection<TBase, TContainer, TComponent>(Owner);
-            _componentCollection.ComponentAdded += OnComponentAdded;
-
+            _componentCollection = new ComponentCollection<TBase, TContainer, TComponent>(Owner, RaiseComponentsChanged);
             Components = new WrappedObservableCollection<TComponent>(_componentCollection, Add);
         }
 

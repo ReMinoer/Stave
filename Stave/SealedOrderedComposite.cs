@@ -28,9 +28,7 @@ namespace Stave
         public SealedOrderedComposite(TContainer owner)
             : base(owner)
         {
-            Components = new ComponentList<TBase, TContainer, TComponent>(Owner);
-            Components.ComponentAdded += OnComponentAdded;
-
+            Components = new ComponentList<TBase, TContainer, TComponent>(Owner, RaiseComponentsChanged);
             _wrappedComponents = new WrappedObservableList<TComponent>(Components, Add);
         }
 
