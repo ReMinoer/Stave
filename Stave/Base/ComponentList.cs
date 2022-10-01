@@ -42,14 +42,36 @@ namespace Stave.Base
         }
 
         public virtual void Insert(int index, TComponent item)
-            => CheckAndInsert(item,
-                () => Components.Insert(index, item),
-                () => CollectionChangedEventArgs.Insert(item, index));
+        {
+            CheckAndInsert(
+                item,
+                () =>
+                {
+                    if (index == Count)
+                        Components.Add(item);
+                    else
+                        Components.Insert(index, item);
+                },
+                () => CollectionChangedEventArgs.Insert(item, index)
+            );
+        }
 
         public virtual void RemoveAt(int index)
         {
-            Components.RemoveAt(index);
-            Components[index].Parent = null;
+            TComponent item = Components[index];
+            Remove(item, index);
+        }
+
+        public void Move(int oldIndex, int newIndex)
+        {
+            TComponent item = Components[oldIndex];
+
+            Components.RemoveAt(oldIndex);
+            Components.Insert(newIndex, item);
+
+            NotifyPropertyChanged(CollectionChangedEventArgs.Move(item, oldIndex, newIndex));
+            _raiseComponentsChanged(ComponentsChangedEventArgs<TBase, TContainer, TComponent>.Remove(_owner, item));
+            _raiseComponentsChanged(ComponentsChangedEventArgs<TBase, TContainer, TComponent>.Add(_owner, item));
         }
     }
 }

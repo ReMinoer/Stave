@@ -13,8 +13,8 @@ namespace Stave.Base
         where TContainer : class, TBase, IContainer<TBase, TContainer>
         where TComponent : class, TBase
     {
-        private readonly TContainer _owner;
-        private readonly Action<IComponentsChangedEventArgs<TBase, TContainer, TComponent>> _raiseComponentsChanged;
+        protected readonly TContainer _owner;
+        protected readonly Action<IComponentsChangedEventArgs<TBase, TContainer, TComponent>> _raiseComponentsChanged;
 
         protected readonly List<TComponent> Components;
         public int Count => Components.Count;
@@ -56,7 +56,7 @@ namespace Stave.Base
             addAction();
             item.Parent = _owner;
 
-            CollectionChanged?.Invoke(this, collectionEventArgsFunc());
+            NotifyPropertyChanged(collectionEventArgsFunc());
             _raiseComponentsChanged(ComponentsChangedEventArgs<TBase, TContainer, TComponent>.Add(_owner, item));
         }
 
@@ -69,12 +69,17 @@ namespace Stave.Base
             if (index == -1)
                 return false;
 
+            Remove(item, index);
+            return true;
+        }
+
+        protected void Remove(TComponent item, int index)
+        {
             Components.RemoveAt(index);
             item.Parent = null;
 
-            CollectionChanged?.Invoke(this, CollectionChangedEventArgs.Remove(item, index));
+            NotifyPropertyChanged(CollectionChangedEventArgs.Remove(item, index));
             _raiseComponentsChanged(ComponentsChangedEventArgs<TBase, TContainer, TComponent>.Remove(_owner, item));
-            return true;
         }
 
         public void Clear()
@@ -91,7 +96,7 @@ namespace Stave.Base
                 removedComponents.Add(component);
             }
 
-            CollectionChanged?.Invoke(this, CollectionChangedEventArgs.Clear());
+            NotifyPropertyChanged(CollectionChangedEventArgs.Clear());
 
             foreach (TComponent removedComponent in removedComponents)
                 _raiseComponentsChanged(ComponentsChangedEventArgs<TBase, TContainer, TComponent>.Remove(_owner, removedComponent));
@@ -104,6 +109,8 @@ namespace Stave.Base
 
             return Components.Contains(item);
         }
+
+        protected void NotifyPropertyChanged(NotifyCollectionChangedEventArgs eventArgs) => CollectionChanged?.Invoke(this, eventArgs);
         
         bool ICollection<TComponent>.IsReadOnly => false;
         void ICollection<TComponent>.CopyTo(TComponent[] array, int arrayIndex) => throw new InvalidOperationException();
